@@ -1,0 +1,1 @@
+export const getOrderbookState = state => state.orderbook;

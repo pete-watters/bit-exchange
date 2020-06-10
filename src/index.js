@@ -2,6 +2,8 @@
 /* eslint-disable import/no-webpack-loader-syntax */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 import OrderbookWorker from 'worker-loader!./services/orderbook/worker';
 import { orderBook as orderBookClass, trades as tradesClass } from 'styles/main.scss';
 import { BIT_EXCHANGE } from 'constants';
@@ -10,10 +12,11 @@ import Layout from 'components/Layout';
 import ErrorBoundary from 'containers/ErrorBoundary';
 import { serializeOrderBook } from 'services/orderbook/helpers';
 import OrderBook from 'features/orderbook/OrderBook';
-import LatestTrades from 'features/latest-trades/LatestTrades';
+import LatestTrades from 'features/trades/LatestTrades';
 import Ticker from 'features/ticker/Ticker';
-import { getLatestTrades, generateLatestTrade } from 'features/latest-trades/helpers';
+import { getLatestTrades, generateLatestTrade } from 'features/trades/helpers';
 import SocketManager from 'services/bitfinex/SocketManager';
+import rootReducer from './reducers';
 
 class App extends React.Component {
   constructor(props) {
@@ -76,5 +79,12 @@ class App extends React.Component {
     );
   }
 }
+// TODO figure out what I want to put into stats here
+const store = createStore(rootReducer);
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+, document.getElementById('app'));
+

@@ -8,7 +8,7 @@
 @import './components/_header';
 @import './components/_error';
 @import './features/orderbook/_index';
-@import './features/latest-trades/_index';
+@import './features/trades/_index';
 
 html, body {
   background-color: $white;

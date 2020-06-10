@@ -1,70 +1,26 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-// import io from 'socket.io-client';
+import { Logger } from 'utils/logger';
+import { updateOrderbook } from 'features/orderbook/actions';
+import { updateTicker } from 'features/ticker/actions';
+import { updateTrades } from 'features/trades/actions';
+import { SocketContext } from './context';
 
 const ONE_THOUSAND = 1000;
 const TIMEOUT = 250;
-
-// defining the context with empty channels object
-export const SocketContext = React.createContext({
-  channels: [],
-  // FIXME - I made channels an array? Maybe I should have an object for each channel here?
-});
-// TODO move this to hooks
-// defining a useWebsocket hook for functional components
-export const useWebsocket = () => React.useContext(SocketContext);
 
 class SocketManager extends React.Component {
   state = {
     channels: [],
   }
   socket = null;
-  channels = ['trades', 'ticker', 'book'];
-
-  // so in my state
-  // - channels with: name, id, data
-  // if I get subscribe - add that channel and its ID
-  // for other messages, the first field is ID then data so use that to update
+  channels = ['book', 'ticker', 'trades'];
 
   constructor (props) {
     super(props);
-
     this.socket = new WebSocket('wss://api-pub.bitfinex.com/ws/2');
-
-    this.socket.onmessage = message => {
-      // console.log(JSON.parse(message.data));
-      const data = JSON.parse(message.data);
-      const { event, channel, chanId } = data;
-
-      switch (event) {
-        case 'subscribed':
-        // console.log('subscribed');
-        this.setState(prevState => ({
-            channels: [
-              ...prevState.channels,
-              { channel, id: chanId, data: null},
-            ],
-         }));
-          break;
-        case 'info':
-          console.log('info', message);
-          break;
-        default:
-          console.log(message);
-          // TODO need better protection here for other events
-          if (data) {
-            const [ channelId, channelData ] = data;
-            this.setState(prevState => ({
-              channels: prevState.channels.map(chan =>
-                chan.id === channelId
-                  ? { ...chan, data: channelData }
-                  : chan
-              ),
-            }));
-          }
-          break;
-      }
-    };
+    this.socket.onmessage = message => this.handleSocketMessage(message);
   }
 
   componentDidMount() {
@@ -74,6 +30,45 @@ class SocketManager extends React.Component {
   componentWillUnmount() {
     this.disconnect();
   }
+  handleSocketMessage = message => {
+    const data = JSON.parse(message.data);
+    const { event, channel, chanId } = data;
+
+    switch (event) {
+      case 'subscribed':
+      this.setState(prevState => ({
+          channels: [
+            ...prevState.channels,
+            { channel, id: chanId, data: null},
+          ],
+       }));
+        break;
+      case 'info':
+        break;
+      default:
+        // TODO need better protection here for other events
+        if (data) {
+          const { channels: stateChannels} = this.state;
+          const [ channelId, channelData ] = data;
+          const { syncOrderbook, syncTicker, syncTrades } = this.props;
+          // DO this now call right action
+          const updateChannel = stateChannels.filter(chan => chan.id === channelId)[0]["channel"];
+          
+          switch (updateChannel) {
+            case 'book':
+              syncOrderbook({ data: channelData});
+            break;
+            case 'ticker':
+              syncTicker({ data: channelData});
+            break;
+            case 'trades':
+              syncTrades({ data: channelData});
+              break;
+          }
+        }
+        break;
+    }
+  };
   sendToChannel = (channel, event, symbol) =>
   this.socket.send(JSON.stringify({
       event,
@@ -85,18 +80,16 @@ class SocketManager extends React.Component {
     let that = this; // cache the this
     let connectInterval;
 
-    // websocket onopen event listener
     this.socket.onopen = () => {
         this.channels.map(channel => this.sendToChannel(channel, 'subscribe', 'tBTCUSD'));
-        this.setState({ ws: this.socket });
-        that.timeout = TIMEOUT; // reset timer to TIMEOUT on open of websocket connection
-        clearTimeout(connectInterval); // clear Interval on on open of websocket connection
+        that.timeout = TIMEOUT;
+        clearTimeout(connectInterval);
     };
 
     // websocket onclose event listener
     this.socket.onclose = e => {
         this.disconnect();
-        console.log(
+        Logger(
             `Socket is closed. Reconnect will be attempted in ${Math.min(
                 ONE_THOUSAND / ONE_THOUSAND,
                 (that.timeout + that.timeout) / ONE_THOUSAND
@@ -104,13 +97,13 @@ class SocketManager extends React.Component {
             e.reason
         );
 
-        that.timeout = that.timeout + that.timeout; //increment retry interval
-        connectInterval = setTimeout(this.check, Math.min(ONE_THOUSAND, that.timeout)); //call check function after timeout
+        that.timeout = that.timeout + that.timeout;
+        connectInterval = setTimeout(this.check, Math.min(ONE_THOUSAND, that.timeout));
     };
 
     // websocket onerror event listener
     this.socket.onerror = err => {
-        console.error(
+        Logger(
             "Socket encountered error: ",
             err.message,
             "Closing socket"
@@ -128,18 +121,11 @@ class SocketManager extends React.Component {
       }
     } catch (e) {
       // socket not connected
+      Logger('Socket not connected');
     }
   }
-/**
- * utilited by the @function connect to check if the connection is close, if so attempts to reconnect
- */
 check = () => {
-  // TODO need to make surte this works with my new way
-  // I replace ws with this.socket but this ws is used to handle reconnection
-    const { ws } = this.state;
-
-    //check if websocket instance is closed, if so call `connect` function.
-    if (!ws || ws.readyState == WebSocket.CLOSED) this.connect();
+    if (!this.socket || this.socket.readyState == WebSocket.CLOSED) this.connect();
 };
 
   render () {
@@ -155,6 +141,18 @@ check = () => {
 
 SocketManager.propTypes = {
   children: PropTypes.array.isRequired,
+  syncOrderbook: PropTypes.func.isRequired,
+  syncTicker: PropTypes.func.isRequired,
+  syncTrades: PropTypes.func.isRequired,
 };
 
-export default SocketManager;
+const mapDispatchToProps = {
+  syncOrderbook: updateOrderbook,
+  syncTicker: updateTicker,
+  syncTrades: updateTrades,
+};
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(SocketManager);

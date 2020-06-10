@@ -1,0 +1,1 @@
+export const getTickerState = state => state.ticker;

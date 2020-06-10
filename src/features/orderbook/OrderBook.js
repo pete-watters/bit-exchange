@@ -1,7 +1,9 @@
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { bid, ask } from 'styles/main.scss';
 import Table from './components/Table';
+import { getOrderbookState } from './selectors';
 
 class OrderBook extends PureComponent {
   constructor() {
@@ -17,9 +19,9 @@ class OrderBook extends PureComponent {
 
   render() {
     // throw new Error('I crashed!'); // - TODO uncomment me to test error page
-    const { data: { bids, asks } } = this.props;
+    const { orderBook, data: { bids, asks } } = this.props;
     const { highlightRow } = this.state;
-
+    console.log(orderBook);
     return (
       <>
         <Table
@@ -42,7 +44,15 @@ class OrderBook extends PureComponent {
 }
 
 OrderBook.propTypes = {
+  orderBook: PropTypes.array.isRequired,
   data: PropTypes.object.isRequired,
 };
 
-export default OrderBook;
+const mapStateToProps = state => ({
+  orderBook: getOrderbookState(state),
+});
+
+export default connect(
+  mapStateToProps,
+)(OrderBook);
+
