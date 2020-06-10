@@ -1,0 +1,41 @@
+$arial: 'Arial, Helvetica', sans-serif;
+$roboto: 'Roboto Mono', monospace;
+$orbitron: 'Orbitron', sans-serif;
+
+html,
+body {
+  font-family: $arial;
+  color: $mine-shaft;
+  font-size: 1rem;
+  line-height: 1.25rem;
+  letter-spacing: 0;
+  font-weight: normal;
+}
+
+* {
+  font-family: $roboto;
+}
+
+h1 {
+  color: $white;
+  font-family: $orbitron;
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  letter-spacing: 0.01em;
+}
+
+em {
+  opacity: 0.5;
+  font-style: normal;
+}

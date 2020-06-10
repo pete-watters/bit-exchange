@@ -1,0 +1,4 @@
+export const LATEST_TRADES = {
+  DECIMAL_PLACES: 8,
+  LIST_LENGTH: 5,
+};

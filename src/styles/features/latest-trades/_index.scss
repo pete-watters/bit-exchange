@@ -1,0 +1,10 @@
+.#{$trades} {
+  margin: auto;
+  grid-area: trades;
+  article{ 
+    margin: 1rem;
+  }
+  @include medium {
+    margin: 0.5rem;
+  }
+}

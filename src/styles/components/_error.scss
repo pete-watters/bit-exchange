@@ -1,0 +1,157 @@
+@import '../mixins/_flex';
+@import '../mixins/_size';
+@import '../base/_colors';
+
+$errorPage: error-page;
+$dot: dot;
+$needle: needle;
+$base: base;
+$lines: lines;
+$vertical: vertical;
+$horizontal: horizontal;
+$diskWrapper: disk-wrapper;
+$disk: disk;
+$halfCircleTop: half-circle-top;
+$halfCircleBottom: half-circle-bottom;
+$separator: separator;
+$innerCircle: inner-circle;
+
+.#{$errorPage} {
+    grid-area: main;
+    width: 15.375rem;
+    margin: 4rem auto;
+    position: relative;
+    h3, button {
+      margin: 1rem;
+    }
+}
+
+.#{$diskWrapper} {
+  overflow: hidden;
+  position: relative;
+  overflow: hidden;
+  border-radius: 100%;
+  @include flex;
+  @include size(12.5rem);
+}
+
+.#{$disk} {
+  @include flex;
+  @include size(12.5rem);
+  background-color: $bunker;
+  border-radius: 100%;
+  position: relative;
+  animation: circle 2.5s infinite linear;
+
+  .#{$halfCircleTop} {
+    top: 1.875rem;
+    border-top-left-radius: 4.5rem;
+    border-top-right-radius: 4.5rem;
+    border-bottom: 0;
+  }
+
+  .#{$halfCircleBottom} {
+    bottom: 1.875rem;
+    border-bottom-left-radius: 4.5rem;
+    border-bottom-right-radius: 4.5rem;
+    border-top: 0;
+  }
+
+  .#{$halfCircleTop},
+  .#{$halfCircleBottom} {
+    border: 2px solid $soya-bean;
+    @include size(8.75rem, 4.375rem);
+    position: absolute;
+    background-color: $bunker;
+  }
+
+  .#{$separator} {
+    background-color: $bunker;
+    position: absolute;
+    @include size(100%, 3.625rem);
+    top: 36%;
+  }
+
+  .#{$innerCircle}{
+    @include size(90px);
+    background-color: $tahiti-gold;
+    border-radius: 100%;
+    @include flex;
+    z-index: 2;
+
+    span {
+      color: $thunder-bird;
+      font-weight: 900;
+      font-size: 1.563rem;
+    }
+
+    .#{$dot} {
+      @include size(0.625rem);
+      background-color: $black;
+      border-radius: 100%;
+      margin: 0.313rem;
+    }
+  }
+}
+
+.#{$needle} {
+  position: absolute;
+  right: 0;
+
+  .#{$base} {
+    @include size(1.875rem);
+    background-color: $swirl;
+    position: relative;
+    border-radius: 0.188rem;
+    @include flex();
+    &:after {
+      content: "";
+      border-radius: 100%;
+      background-color: $soya-bean;
+      @include size(1.25rem);
+    }
+  }
+
+  .#{$lines} {
+    @include flex();
+    z-index: 4;
+    position: relative;
+    top: -16px;
+    div {
+      background-color: $swirl;
+      border-radius: 3px;
+    }
+    .#{$vertical} {
+      @include size(6px, 50px);
+    }
+    .#{$horizontal} {
+      @include size(66px, 6px);
+      position: absolute;
+      left: -46px;
+      bottom: -13px;
+      transform: rotate(-20deg);
+    }
+  }
+}
+
+@keyframes circle {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+:export {
+  errorPage: $errorPage;
+  dot: $dot;
+  needle: $needle;
+  base: $base;
+  lines: $lines;
+  vertical: $vertical;
+  horizontal: $horizontal;
+  diskWrapper: $diskWrapper;
+  disk: $disk;
+  halfCircleTop: $halfCircleTop;
+  halfCircleBottom: $halfCircleBottom;
+  separator: $separator;
+  innerCircle: $innerCircle;
+}

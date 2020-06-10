@@ -1,0 +1,28 @@
+$small: '30rem';
+$medium: '55rem';
+$large: '75rem';
+$xLarge: '90rem';
+
+@mixin small {
+  @media (min-width: #{$small}) {
+    @content;
+  }
+}
+
+@mixin medium {
+  @media (min-width: #{$medium}) {
+    @content;
+  }
+}
+
+@mixin large {
+  @media (min-width: #{$large}) {
+    @content;
+  }
+}
+
+@mixin xLarge {
+  @media (min-width: #{$xLarge}) {
+    @content;
+  }
+}

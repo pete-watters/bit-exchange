@@ -1,0 +1,11 @@
+.#{$orderBook} {
+  margin: auto;
+  grid-area: orderbook;
+  display:flex;
+  article{ 
+    margin: 1rem;
+  }
+  @include medium {
+    margin: 0.5rem;
+  }
+}
