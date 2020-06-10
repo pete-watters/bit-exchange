@@ -21,7 +21,7 @@ class OrderBook extends PureComponent {
     // throw new Error('I crashed!'); // - TODO uncomment me to test error page
     const { orderBook, data: { bids, asks } } = this.props;
     const { highlightRow } = this.state;
-    console.log(orderBook);
+    // console.log(orderBook);
     return (
       <>
         <Table
@@ -44,7 +44,7 @@ class OrderBook extends PureComponent {
 }
 
 OrderBook.propTypes = {
-  orderBook: PropTypes.array.isRequired,
+  orderBook: PropTypes.object.isRequired,
   data: PropTypes.object.isRequired,
 };
 

@@ -10,6 +10,8 @@ import { SocketContext } from './context';
 const ONE_THOUSAND = 1000;
 const TIMEOUT = 250;
 
+const isHeartBeat = channelData => channelData === 'hb';
+
 class SocketManager extends React.Component {
   state = {
     channels: [],
@@ -33,37 +35,40 @@ class SocketManager extends React.Component {
   handleSocketMessage = message => {
     const data = JSON.parse(message.data);
     const { event, channel, chanId } = data;
-
+    // FIXME this clearly needs refactoring to be split up but it's not yet working solidly
     switch (event) {
       case 'subscribed':
       this.setState(prevState => ({
           channels: [
             ...prevState.channels,
-            { channel, id: chanId, data: null},
+            { channel, id: chanId},
           ],
        }));
         break;
       case 'info':
         break;
       default:
-        // TODO need better protection here for other events
+        // FIXME need better protection here for other events
         if (data) {
           const { channels: stateChannels} = this.state;
           const [ channelId, channelData ] = data;
           const { syncOrderbook, syncTicker, syncTrades } = this.props;
-          // DO this now call right action
           const updateChannel = stateChannels.filter(chan => chan.id === channelId)[0]["channel"];
-          
-          switch (updateChannel) {
-            case 'book':
-              syncOrderbook({ data: channelData});
-            break;
-            case 'ticker':
-              syncTicker({ data: channelData});
-            break;
-            case 'trades':
-              syncTrades({ data: channelData});
+          if (!isHeartBeat(channelData)) {
+            switch (updateChannel) {
+              case 'book':
+                // debugger;
+                syncOrderbook({ data: channelData});
               break;
+              case 'ticker':
+                debugger;
+                syncTicker({ data: channelData});
+              break;
+              case 'trades':
+                // debugger;
+                syncTrades({ data: channelData});
+                break;
+            }
           }
         }
         break;
@@ -140,7 +145,7 @@ check = () => {
 }
 
 SocketManager.propTypes = {
-  children: PropTypes.array.isRequired,
+  children: PropTypes.object.isRequired,
   syncOrderbook: PropTypes.func.isRequired,
   syncTicker: PropTypes.func.isRequired,
   syncTrades: PropTypes.func.isRequired,

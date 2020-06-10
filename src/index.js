@@ -8,7 +8,6 @@ import OrderbookWorker from 'worker-loader!./services/orderbook/worker';
 import { orderBook as orderBookClass, trades as tradesClass } from 'styles/main.scss';
 import { BIT_EXCHANGE } from 'constants';
 import Layout from 'components/Layout';
-// import Loading from 'components/Loading';
 import ErrorBoundary from 'containers/ErrorBoundary';
 import { serializeOrderBook } from 'services/orderbook/helpers';
 import OrderBook from 'features/orderbook/OrderBook';
@@ -56,7 +55,6 @@ class App extends React.Component {
 
   render() {
     const { currentTime, latestTradePrice, latestTrades, orderBook } = this.state;
-    // return ( <Loading />);
     return (
       <ErrorBoundary>
         <SocketManager>
@@ -79,7 +77,6 @@ class App extends React.Component {
     );
   }
 }
-// TODO figure out what I want to put into stats here
 const store = createStore(rootReducer);
 
 ReactDOM.render(
