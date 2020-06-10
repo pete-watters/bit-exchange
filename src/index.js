@@ -13,6 +13,7 @@ import OrderBook from 'features/orderbook/OrderBook';
 import LatestTrades from 'features/latest-trades/LatestTrades';
 import Ticker from 'features/ticker/Ticker';
 import { getLatestTrades, generateLatestTrade } from 'features/latest-trades/helpers';
+import SocketManager from 'services/bitfinex/SocketManager';
 
 class App extends React.Component {
   constructor(props) {
@@ -55,20 +56,22 @@ class App extends React.Component {
     // return ( <Loading />);
     return (
       <ErrorBoundary>
-        <Layout>
-          <Ticker price={`${latestTradePrice} ${BIT_EXCHANGE.CURRENCY}`} />
-          <article className={orderBookClass}>
-            <OrderBook data={orderBook} latestTradePrice={latestTradePrice} />
-          </article>
-          <aside className={tradesClass}>
-            <article>
-              <h3>{currentTime}</h3>
+        <SocketManager>
+          <Layout>
+            <Ticker price={`${latestTradePrice} ${BIT_EXCHANGE.CURRENCY}`} />
+            <article className={orderBookClass}>
+              <OrderBook data={orderBook} latestTradePrice={latestTradePrice} />
             </article>
-            <article>
-              <LatestTrades latestTrades={latestTrades} />
-            </article>
-          </aside>
-        </Layout>
+            <aside className={tradesClass}>
+              <article>
+                <h3>{currentTime}</h3>
+              </article>
+              <article>
+                <LatestTrades latestTrades={latestTrades} />
+              </article>
+            </aside>
+          </Layout>
+        </SocketManager>
       </ErrorBoundary>
     );
   }
